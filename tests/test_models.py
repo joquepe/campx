@@ -171,6 +171,18 @@ class TestDay:
         day = Day(date=date)
         assert day.as_str("%d/%m/%Y") == "15/03/2026"
 
+    def test_day_as_str_with_swedish_abbreviated_month(self):
+        """Test day string representation with Swedish abbreviated month."""
+        date = dt.date(2026, 4, 15)
+        day = Day(date=date)
+        assert day.as_str("%d %b", swedish_month_names=True) == "15 apr."
+
+    def test_day_as_str_with_swedish_full_month(self):
+        """Test day string representation with Swedish full month."""
+        date = dt.date(2026, 4, 15)
+        day = Day(date=date)
+        assert day.as_str("%d %B", swedish_month_names=True) == "15 april"
+
     def test_day_get_entries_by_type(self):
         """Test retrieving entries by type from a day."""
         date = dt.date(2026, 3, 15)
