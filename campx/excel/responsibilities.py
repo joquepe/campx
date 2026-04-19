@@ -66,7 +66,11 @@ def fill_responsibilities_sheet(camp: Camp, ws: Worksheet):
         ws.merge_cells(
             start_row=1, start_column=start_col, end_row=1, end_column=end_col
         )
-        ws.cell(row=1, column=start_col, value=day.as_str(format="%d %b"))
+        ws.cell(
+            row=1,
+            column=start_col,
+            value=day.as_str(format="%d %b", swedish_month_names=True),
+        )
         ws.cell(row=1, column=start_col).alignment = Alignment(
             vertical="center", horizontal="center"
         )

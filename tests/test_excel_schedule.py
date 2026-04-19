@@ -56,6 +56,50 @@ class TestExcelScheduleGeneration:
         assert ws.page_setup.fitToHeight == 1
         assert ws.sheet_properties.pageSetUpPr.fitToPage is True
 
+    def test_schedule_date_row_uses_swedish_month_names(self):
+        wb = Workbook()
+        ws = wb.active
+
+        day = Day(date=__import__("datetime").date(2026, 4, 12))
+        camp = Camp(
+            name="TestCamp",
+            camp_place=CampPlace("TestPlace"),
+            participants=[],
+            schedule=Schedule(days=[day]),
+        )
+
+        fill_schedule_sheet(camp, ws)
+
+        assert (
+            ws.cell(row=EntryType.time_independent_top().__len__() + 1, column=2).value
+            == "12 apr."
+        )
+
+    def test_responsibilities_sheet_uses_swedish_month_names(self):
+        wb = Workbook()
+        ws = wb.active
+
+        leader = Participant(
+            participant_id=1,
+            first_name="Alice",
+            last_name="Andersson",
+            gender="F",
+            birthday="1990-01-15",
+            participant_type=ParticipantType.LEADER,
+        )
+
+        day = Day(date=__import__("datetime").date(2026, 4, 12))
+        camp = Camp(
+            name="TestCamp",
+            camp_place=CampPlace("TestPlace"),
+            participants=[leader],
+            schedule=Schedule(days=[day]),
+        )
+
+        fill_responsibilities_sheet(camp, ws)
+
+        assert ws.cell(row=1, column=2).value == "12 apr."
+
     def test_time_dependent_activity_uses_custom_name_when_available(self):
         """Test that time-dependent activities use custom name when available."""
         # Create a mock worksheet

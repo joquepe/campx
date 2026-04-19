@@ -93,7 +93,11 @@ def fill_schedule_sheet(
     # Create date headers
     date_row = buffer_rows_top + 1
     for col, day in enumerate(camp.schedule.days, start=2):
-        date_cell = worksheet.cell(row=date_row, column=col, value=day.as_str("%d %b"))
+        date_cell = worksheet.cell(
+            row=date_row,
+            column=col,
+            value=day.as_str("%d %b", swedish_month_names=True),
+        )
         date_cell.font = Font(bold=True)
 
     # Fill top time-independent values per day
