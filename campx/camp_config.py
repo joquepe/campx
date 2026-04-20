@@ -46,6 +46,7 @@ DEFAULT_VALIDATION_CONFIG = {
             EntryType.SLEEP_IN: 2,
             EntryType.DAY_OFF: 1,
         },
+        "min_days_between_entry_types": ((EntryType.DAY_OFF, EntryType.SLEEP_IN, 2),),
     },
     "entry_limits": {
         "max_responsible_per_entry_type": {
@@ -131,6 +132,12 @@ def get_validation_config(camp_name: str) -> dict:
                 "leader_limits"
             ]["min_responsibilities_per_entry_type"]
             | leader_overrides.get("min_responsibilities_per_entry_type", {}),
+            "min_days_between_entry_types": leader_overrides.get(
+                "min_days_between_entry_types",
+                DEFAULT_VALIDATION_CONFIG["leader_limits"][
+                    "min_days_between_entry_types"
+                ],
+            ),
         },
         "entry_limits": {
             "max_responsible_per_entry_type": DEFAULT_VALIDATION_CONFIG["entry_limits"][
