@@ -240,3 +240,24 @@ class TooManyEntriesWhileDayHostValidationError(ValidationError):
             f"Leader {self.leader_name} has too many entries on a day they are "
             f"hosting ({self.day_label}): {self.actual} > {self.max_allowed}"
         )
+
+
+@dataclass(frozen=True)
+class MinDaysBetweenEntryTypesValidationError(ValidationError):
+    """Raised when a leader has insufficient days between certain entry types."""
+
+    leader_name: str
+    type1: EntryType
+    type2: EntryType
+    actual_min_days: int
+    required_min_days: int
+    code: str = field(init=False, default="min_days_between_entry_types")
+    severity: ValidationSeverity = field(init=False, default=ValidationSeverity.MINOR)
+
+    @property
+    def message(self) -> str:
+        return (
+            f"Leader {self.leader_name} has only {self.actual_min_days} days between "
+            f"entries of type {self.type1.name} and {self.type2.name}, but at least "
+            f"{self.required_min_days} are required"
+        )

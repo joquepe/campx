@@ -17,6 +17,7 @@ from campx.validation.errors import (
     OverlapValidationError,
     TooManyEntriesWhileDayHostValidationError,
     ValidationError,
+    MinDaysBetweenEntryTypesValidationError,
 )
 from campx.validation.rule_types import Validation
 
@@ -184,6 +185,28 @@ def too_many_entries_while_day_host(
                     )
 
 
+def min_days_between_entry_types(
+    leader: Participant, camp: Camp
+) -> Iterable[ValidationError]:
+    """Yield errors when a leader has certain entry types scheduled too close together."""
+    min_days_between = get_validation_config(camp.name)["leader_limits"][
+        "min_days_between_entry_types"
+    ]
+    for entry_type1, entry_type2, min_days in min_days_between:
+        dates1 = get_dates(leader, camp, entry_type1)
+        dates2 = get_dates(leader, camp, entry_type2)
+        for date1 in dates1:
+            for date2 in dates2:
+                if abs((date1 - date2).days) < min_days:
+                    yield MinDaysBetweenEntryTypesValidationError(
+                        leader_name=leader.full_name,
+                        type1=entry_type1,
+                        type2=entry_type2,
+                        actual_min_days=abs((date1 - date2).days),
+                        required_min_days=min_days,
+                    )
+
+
 def _get_overlap_rules(camp: Camp) -> tuple[OverlapRule, ...]:
     overlap_rule_specs = get_validation_config(camp.name)["leader_limits"][
         "overlap_rules"
@@ -214,4 +237,5 @@ VALIDATIONS = [
     Validation(func=no_responsibilities_at_all),
     Validation(func=min_num_of_responsibilities_per_entry_type),
     Validation(func=too_many_entries_while_day_host),
+    Validation(func=min_days_between_entry_types),
 ]
