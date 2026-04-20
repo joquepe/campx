@@ -54,8 +54,6 @@ def fill_eligible_leaders_sheet(camp: Camp, ws: Worksheet):
     row = 2
     for day in camp.schedule.days:
         for entry in day.schedule_entries:
-            if not entry.entry_type.value.requires_responsible:
-                continue
             ws.cell(row=row, column=1, value=day.as_str())
             ws.cell(row=row, column=2, value=entry.entry_type.value.short)
             entry_color = get_activity_color(entry.entry_type)
