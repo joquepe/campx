@@ -23,6 +23,8 @@ class Participant:
     roles: list[Role] | None = None
     leader_year_type: LeaderYearType | None = None
     nick_name: str | None = None
+    first_name_initials: str | None = None
+    last_name_initials: str | None = None
 
     @property
     def full_name(self) -> str:
@@ -37,21 +39,12 @@ class Participant:
         if (today.month, today.day) < (self.birthday.month, self.birthday.day):
             age -= 1
         return age
-
-    @property
-    def first_name_initial(self) -> str:
-        """Return initials derived from all first-name parts."""
-        return "".join(part[0] for part in self.first_name.split(" "))
-
-    @property
-    def last_name_initials(self) -> str:
-        """Return initials derived from all last-name parts."""
-        return "".join(part[0] for part in self.last_name.split(" "))
-
+    
     @property
     def initials(self) -> str:
-        """Return the participant's combined initials."""
-        return self.first_name_initial + self.last_name_initials
+        """Return the participant's initials for display."""
+        return self.first_name_initials + self.last_name_initials
+        
 
     def get_responsible_entries(
         self,

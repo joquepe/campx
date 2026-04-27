@@ -63,6 +63,36 @@ def _assign_nicknames(participants: list[Participant]) -> None:
         "All participants should have a nickname"
     )
 
+def _assign_initials(participants: list[Participant]) -> None:
+    """Assign initials to participants.
+    
+    If two participants have the same initials, add the second letter in first name to make them unique.
+    If a participant has several words in their last name, use the first letter of each word."""
+    initials_set = set()
+    for participant in participants:
+        last_name_initials = "".join(word[0] for word in participant.last_name.split())
+        test_initials = f"{participant.first_name[0]}{last_name_initials}"
+        if test_initials not in initials_set:
+            participant.first_name_initials = participant.first_name[0]
+            participant.last_name_initials = last_name_initials
+            initials_set.add(test_initials)
+            continue
+        test_initials = f"{participant.first_name[:2]}{last_name_initials}"
+        if test_initials not in initials_set:
+            participant.first_name_initials = participant.first_name[:2]
+            participant.last_name_initials = last_name_initials
+            initials_set.add(test_initials)
+            continue
+        raise ValueError(
+            f"Could not assign unique initials for participant {participant.full_name}"
+        )
+    assert len(initials_set) == len(participants), (
+        "Each participant should have unique initials"
+    )
+    assert all(p.first_name_initials and p.last_name_initials for p in participants), (
+        "All participants should have initials"
+    )
+
 
 class Factory:
     """Builds camps, participants, and schedules from input files."""
@@ -100,6 +130,7 @@ class Factory:
         for record in participant_records:
             participant = self.create_participant(record, repo)
             participants.append(participant)
+        _assign_initials(participants)
         _assign_nicknames(participants)
         return participants
 
