@@ -63,9 +63,10 @@ def _assign_nicknames(participants: list[Participant]) -> None:
         "All participants should have a nickname"
     )
 
+
 def _assign_initials(participants: list[Participant]) -> None:
     """Assign initials to participants.
-    
+
     If two participants have the same initials, add the second letter in first name to make them unique.
     If a participant has several words in their last name, use the first letter of each word."""
     initials_set = set()
@@ -77,15 +78,19 @@ def _assign_initials(participants: list[Participant]) -> None:
             participant.last_name_initials = last_name_initials
             initials_set.add(test_initials)
             continue
+        counter = 2
         test_initials = f"{participant.first_name[:2]}{last_name_initials}"
-        if test_initials not in initials_set:
-            participant.first_name_initials = participant.first_name[:2]
+        while test_initials in initials_set and counter < len(participant.first_name):
+            counter += 1
+            test_initials = f"{participant.first_name[:counter]}{last_name_initials}"
+        if counter < len(participant.first_name):
+            participant.first_name_initials = participant.first_name[:counter]
             participant.last_name_initials = last_name_initials
             initials_set.add(test_initials)
-            continue
-        raise ValueError(
-            f"Could not assign unique initials for participant {participant.full_name}"
-        )
+        else:
+            raise ValueError(
+                f"Could not assign unique initials for participant {participant.full_name}"
+            )
     assert len(initials_set) == len(participants), (
         "Each participant should have unique initials"
     )

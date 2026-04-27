@@ -10,6 +10,7 @@ from campx.validation.errors import (
     OnlyFirstYearResponsibleValidationError,
     TooManyResponsibleValidationError,
     ValidationError,
+    TooFewResponsibleValidationError,
 )
 from campx.validation.rule_types import EntryValidation
 
@@ -30,6 +31,27 @@ def too_many_responsible(
                 day_label=day.as_str(),
                 actual=len(schedule_entry.responsible),
                 max_allowed=max_responsible,
+            )
+        )
+    return errors
+
+
+def too_few_responsible(
+    schedule_entry: ScheduleEntry, day: Day, camp: Camp
+) -> list[ValidationError]:
+    """Validate that an entry does not have fewer responsibles than required."""
+    min_responsible_per_entry_type = get_validation_config(camp.name)["entry_limits"][
+        "min_responsible_per_entry_type"
+    ]
+    min_responsible = min_responsible_per_entry_type.get(schedule_entry.entry_type, 0)
+    errors: list[ValidationError] = []
+    if len(schedule_entry.responsible) < min_responsible:
+        errors.append(
+            TooFewResponsibleValidationError(
+                entry_type=schedule_entry.entry_type,
+                day_label=day.as_str(),
+                actual=len(schedule_entry.responsible),
+                min_required=min_responsible,
             )
         )
     return errors
@@ -97,4 +119,5 @@ ENTRY_VALIDATIONS = [
     EntryValidation(func=duplicate_responsible),
     EntryValidation(func=only_first_year_leaders_responsible),
     EntryValidation(func=no_responsible_at_all),
+    EntryValidation(func=too_few_responsible),
 ]

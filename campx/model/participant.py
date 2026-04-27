@@ -39,12 +39,11 @@ class Participant:
         if (today.month, today.day) < (self.birthday.month, self.birthday.day):
             age -= 1
         return age
-    
+
     @property
     def initials(self) -> str:
         """Return the participant's initials for display."""
         return self.first_name_initials + self.last_name_initials
-        
 
     def get_responsible_entries(
         self,

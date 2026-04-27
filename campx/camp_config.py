@@ -19,6 +19,7 @@ DEFAULT_VALIDATION_CONFIG = {
             (EntryType.WAKE_UP, EntryType.WAKE_UP, 1, 0),
             (EntryType.EVENING_PRAYER, EntryType.DAY_OFF, 1, 0),
             (EntryType.EVENING_PRAYER, EntryType.MORNING_PRAYER, 1, 0),
+            (EntryType.EVENING_PRAYER, EntryType.WAKE_UP, 1, 0),
         ),
         "max_responsibilities_per_day": 3,
         "max_responsibilities_per_entry_type": (
@@ -61,6 +62,14 @@ DEFAULT_VALIDATION_CONFIG = {
             EntryType.SLEEP_IN: 4,
             EntryType.DAY_OFF: 5,
             EntryType.BOAT: 4,
+            EntryType.DAY_HOST: 4,
+        },
+        "min_responsible_per_entry_type": {
+            EntryType.MORNING_PRAYER: 2,
+            EntryType.EVENING_PRAYER: 2,
+            EntryType.WAKE_UP: 4,
+            EntryType.PUT_TO_BED: 4,
+            EntryType.EVENING_ACTIVITY: 2,
         },
     },
 }
@@ -144,5 +153,11 @@ def get_validation_config(camp_name: str) -> dict:
                 "max_responsible_per_entry_type"
             ]
             | entry_overrides.get("max_responsible_per_entry_type", {}),
+            "min_responsible_per_entry_type": entry_overrides.get(
+                "min_responsible_per_entry_type",
+                DEFAULT_VALIDATION_CONFIG["entry_limits"][
+                    "min_responsible_per_entry_type"
+                ],
+            ),
         },
     }

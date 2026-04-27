@@ -1,6 +1,7 @@
 from campx.excel.schedule import find_cell_for_activity
 from campx.excel.schedule import fill_schedule_sheet
 from campx.excel.responsibilities import fill_responsibilities_sheet
+from campx.excel.eligible_leaders import fill_eligible_leaders_sheet
 from campx.model.schedule_entry import ScheduleEntry
 from campx.model.enums import EntryType
 from campx.model.enums import ParticipantType
@@ -9,6 +10,7 @@ from campx.model.camp import Camp
 from campx.model.camp_place import CampPlace
 from campx.model.day import Day
 from campx.model.schedule import Schedule
+from campx.factory import _assign_initials
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
@@ -28,6 +30,7 @@ class TestExcelScheduleGeneration:
             birthday="1990-01-15",
             participant_type=ParticipantType.LEADER,
         )
+        _assign_initials([leader])
 
         day = Day(
             date=__import__("datetime").date(2026, 4, 12),
@@ -87,7 +90,6 @@ class TestExcelScheduleGeneration:
             birthday="1990-01-15",
             participant_type=ParticipantType.LEADER,
         )
-
         day = Day(date=__import__("datetime").date(2026, 4, 12))
         camp = Camp(
             name="TestCamp",
@@ -99,6 +101,54 @@ class TestExcelScheduleGeneration:
         fill_responsibilities_sheet(camp, ws)
 
         assert ws.cell(row=1, column=2).value == "12 apr."
+
+    def test_eligible_leaders_sheet_has_responsible_count_as_third_column(self):
+        wb = Workbook()
+        ws = wb.active
+
+        leader_1 = Participant(
+            participant_id=1,
+            first_name="Alice",
+            last_name="Andersson",
+            gender="F",
+            birthday="1990-01-15",
+            participant_type=ParticipantType.LEADER,
+            first_name_initials="A",
+            last_name_initials="A",
+        )
+        leader_2 = Participant(
+            participant_id=2,
+            first_name="Bo",
+            last_name="Bengtsson",
+            gender="M",
+            birthday="1990-01-15",
+            participant_type=ParticipantType.LEADER,
+            first_name_initials="B",
+            last_name_initials="B",
+        )
+
+        entry = ScheduleEntry(
+            entry_type=EntryType.MORNING_PRAYER,
+            name="",
+            start_time="08:00",
+            end_time="08:30",
+            responsible=[leader_1, leader_2],
+        )
+        day = Day(
+            date=__import__("datetime").date(2026, 4, 12), schedule_entries=[entry]
+        )
+        camp = Camp(
+            name="TestCamp",
+            camp_place=CampPlace("TestPlace"),
+            participants=[leader_1, leader_2],
+            schedule=Schedule(days=[day]),
+        )
+
+        fill_eligible_leaders_sheet(camp, ws)
+
+        assert ws.cell(row=1, column=3).value == "# Ansvariga"
+        assert ws.cell(row=2, column=3).value == 2
+        assert ws.cell(row=1, column=4).value == "AA"
 
     def test_time_dependent_activity_uses_custom_name_when_available(self):
         """Test that time-dependent activities use custom name when available."""
@@ -168,7 +218,7 @@ class TestExcelScheduleGeneration:
         )
 
         time_slots = {"12:00": 10}
-
+        _assign_initials([p1])
         cell, value_to_cell = find_cell_for_activity(time_slots, entry, ws, 2)
 
         # Should use custom name and include responsible initials
@@ -199,6 +249,7 @@ class TestExcelScheduleGeneration:
         )
 
         time_slots = {"12:00": 10}
+        _assign_initials([p1])
 
         cell, value_to_cell = find_cell_for_activity(time_slots, entry, ws, 2)
 
@@ -269,7 +320,7 @@ class TestExcelScheduleGeneration:
             participants=[leader],
             schedule=Schedule(days=[day1, day2]),
         )
-
+        _assign_initials([leader])
         fill_schedule_sheet(camp, ws)
 
         day_col_widths = [
@@ -300,6 +351,7 @@ class TestExcelScheduleGeneration:
             participant_type=ParticipantType.LEADER,
             nick_name="Ali",
         )
+        _assign_initials([leader])
 
         day = Day(
             date=__import__("datetime").date(2026, 4, 12),
