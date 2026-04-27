@@ -75,7 +75,8 @@ def max_num_of_responsibilities_per_day(
         responsibilities = leader.get_responsible_entries(camp.schedule, day)
         if len(responsibilities) > max_allowed_per_day:
             yield MaxResponsibilitiesPerDayValidationError(
-                day_label=day.as_str,
+                leader_name=leader.full_name,
+                day_label=day.as_str(),
                 actual=len(responsibilities),
                 max_allowed=max_allowed_per_day,
             )

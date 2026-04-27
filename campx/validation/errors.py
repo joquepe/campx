@@ -53,6 +53,7 @@ class OverlapValidationError(ValidationError):
 class MaxResponsibilitiesPerDayValidationError(ValidationError):
     """Raised when a leader exceeds the maximum daily assignment count."""
 
+    leader_name: str
     day_label: str
     actual: int
     max_allowed: int
@@ -62,7 +63,7 @@ class MaxResponsibilitiesPerDayValidationError(ValidationError):
     @property
     def message(self) -> str:
         return (
-            f"Too many entries on {self.day_label}: {self.actual} > {self.max_allowed}"
+            f"Too many entries on {self.day_label} for leader {self.leader_name}: {self.actual} > {self.max_allowed}"
         )
 
 
@@ -169,6 +170,25 @@ class TooManyResponsibleValidationError(ValidationError):
         return (
             f"Too many responsible leaders for entry {self.entry_type.name} on "
             f"{self.day_label}: {self.actual} > {self.max_allowed}"
+        )
+
+
+@dataclass(frozen=True)
+class TooFewResponsibleValidationError(ValidationError):
+    """Raised when an entry has fewer responsibles than required."""
+
+    entry_type: EntryType
+    day_label: str
+    actual: int
+    min_required: int
+    code: str = field(init=False, default="too_few_responsible")
+    severity: ValidationSeverity = field(init=False, default=ValidationSeverity.MAJOR)
+
+    @property
+    def message(self) -> str:
+        return (
+            f"Too few responsible leaders for entry {self.entry_type.name} on "
+            f"{self.day_label}: {self.actual} < {self.min_required}"
         )
 
 
