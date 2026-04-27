@@ -41,7 +41,14 @@ def fill_eligible_leaders_sheet(camp: Camp, ws: Worksheet):
         right=Side(style="thin", color=Colors.BLACK),
     )
 
-    col = 3
+    ws.cell(row=1, column=3, value="# Ansvariga")
+    ws.cell(row=1, column=3).font = Font(bold=True)
+    ws.cell(row=1, column=3).border = Border(
+        bottom=Side(style="medium", color=Colors.BLACK),
+        right=Side(style="thin", color=Colors.BLACK),
+    )
+
+    col = 4
     for leader in camp.leaders_incl_management:
         ws.cell(row=1, column=col, value=leader.initials)
         ws.cell(row=1, column=col).font = Font(bold=True)
@@ -56,6 +63,7 @@ def fill_eligible_leaders_sheet(camp: Camp, ws: Worksheet):
         for entry in day.schedule_entries:
             ws.cell(row=row, column=1, value=day.as_str())
             ws.cell(row=row, column=2, value=entry.entry_type.value.short)
+            ws.cell(row=row, column=3, value=len(entry.responsible))
             entry_color = get_activity_color(entry.entry_type)
             ws.cell(row=row, column=2).fill = PatternFill(
                 start_color=entry_color, end_color=entry_color, fill_type="solid"
@@ -68,8 +76,12 @@ def fill_eligible_leaders_sheet(camp: Camp, ws: Worksheet):
                 bottom=Side(style="thin", color=Colors.BLACK),
                 right=Side(style="thin", color=Colors.BLACK),
             )
+            ws.cell(row=row, column=3).border = Border(
+                bottom=Side(style="thin", color=Colors.BLACK),
+                right=Side(style="thin", color=Colors.BLACK),
+            )
 
-            for col, leader in enumerate(camp.leaders_incl_management, start=3):
+            for col, leader in enumerate(camp.leaders_incl_management, start=4):
                 eligible = False
                 comment = None
                 if leader in entry.responsible:
