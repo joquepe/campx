@@ -62,9 +62,7 @@ class MaxResponsibilitiesPerDayValidationError(ValidationError):
 
     @property
     def message(self) -> str:
-        return (
-            f"Too many entries on {self.day_label} for leader {self.leader_name}: {self.actual} > {self.max_allowed}"
-        )
+        return f"Too many entries on {self.day_label} for leader {self.leader_name}: {self.actual} > {self.max_allowed}"
 
 
 @dataclass(frozen=True)

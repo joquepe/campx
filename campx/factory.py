@@ -63,9 +63,10 @@ def _assign_nicknames(participants: list[Participant]) -> None:
         "All participants should have a nickname"
     )
 
+
 def _assign_initials(participants: list[Participant]) -> None:
     """Assign initials to participants.
-    
+
     If two participants have the same initials, add the second letter in first name to make them unique.
     If a participant has several words in their last name, use the first letter of each word."""
     initials_set = set()
