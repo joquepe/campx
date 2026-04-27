@@ -3,7 +3,7 @@ import datetime as dt
 import csv
 
 from campx.repository import Repository
-from campx.factory import Factory
+from campx.factory import Factory, _assign_initials
 from campx.model.participant import Participant
 from campx.model.enums import ParticipantType
 
@@ -331,4 +331,6 @@ class TestEdgeCases:
             birthday=dt.date(1990, 1, 15),
             participant_type=ParticipantType.LEADER,
         )
+        _assign_initials([p])
+
         assert p.initials == "XY"

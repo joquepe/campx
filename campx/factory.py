@@ -78,15 +78,19 @@ def _assign_initials(participants: list[Participant]) -> None:
             participant.last_name_initials = last_name_initials
             initials_set.add(test_initials)
             continue
+        counter = 2
         test_initials = f"{participant.first_name[:2]}{last_name_initials}"
-        if test_initials not in initials_set:
-            participant.first_name_initials = participant.first_name[:2]
+        while test_initials in initials_set and counter < len(participant.first_name):
+            counter += 1
+            test_initials = f"{participant.first_name[:counter]}{last_name_initials}"
+        if counter < len(participant.first_name):
+            participant.first_name_initials = participant.first_name[:counter]
             participant.last_name_initials = last_name_initials
             initials_set.add(test_initials)
-            continue
-        raise ValueError(
-            f"Could not assign unique initials for participant {participant.full_name}"
-        )
+        else:
+            raise ValueError(
+                f"Could not assign unique initials for participant {participant.full_name}"
+            )
     assert len(initials_set) == len(participants), (
         "Each participant should have unique initials"
     )

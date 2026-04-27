@@ -1,4 +1,5 @@
 import datetime as dt
+from campx.model.factory import _assign_initials
 from campx.model.participant import Participant
 from campx.model.schedule_entry import ScheduleEntry
 from campx.model.schedule import Schedule
@@ -51,6 +52,7 @@ class TestParticipant:
             birthday=dt.date(1990, 1, 15),
             participant_type=ParticipantType.LEADER,
         )
+        _assign_initials([p])
         assert p.initials == "JD"
 
     def test_participant_gender_variants(self):

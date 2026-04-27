@@ -10,6 +10,7 @@ from campx.model.camp import Camp
 from campx.model.camp_place import CampPlace
 from campx.model.day import Day
 from campx.model.schedule import Schedule
+from campx.factory import _assign_initials
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
@@ -29,6 +30,7 @@ class TestExcelScheduleGeneration:
             birthday="1990-01-15",
             participant_type=ParticipantType.LEADER,
         )
+        _assign_initials([leader])
 
         day = Day(
             date=__import__("datetime").date(2026, 4, 12),
@@ -88,7 +90,6 @@ class TestExcelScheduleGeneration:
             birthday="1990-01-15",
             participant_type=ParticipantType.LEADER,
         )
-
         day = Day(date=__import__("datetime").date(2026, 4, 12))
         camp = Camp(
             name="TestCamp",
@@ -133,7 +134,9 @@ class TestExcelScheduleGeneration:
             end_time="08:30",
             responsible=[leader_1, leader_2],
         )
-        day = Day(date=__import__("datetime").date(2026, 4, 12), schedule_entries=[entry])
+        day = Day(
+            date=__import__("datetime").date(2026, 4, 12), schedule_entries=[entry]
+        )
         camp = Camp(
             name="TestCamp",
             camp_place=CampPlace("TestPlace"),
@@ -215,7 +218,7 @@ class TestExcelScheduleGeneration:
         )
 
         time_slots = {"12:00": 10}
-
+        _assign_initials([p1])
         cell, value_to_cell = find_cell_for_activity(time_slots, entry, ws, 2)
 
         # Should use custom name and include responsible initials
@@ -246,6 +249,7 @@ class TestExcelScheduleGeneration:
         )
 
         time_slots = {"12:00": 10}
+        _assign_initials([p1])
 
         cell, value_to_cell = find_cell_for_activity(time_slots, entry, ws, 2)
 
@@ -316,7 +320,7 @@ class TestExcelScheduleGeneration:
             participants=[leader],
             schedule=Schedule(days=[day1, day2]),
         )
-
+        _assign_initials([leader])
         fill_schedule_sheet(camp, ws)
 
         day_col_widths = [
@@ -347,6 +351,7 @@ class TestExcelScheduleGeneration:
             participant_type=ParticipantType.LEADER,
             nick_name="Ali",
         )
+        _assign_initials([leader])
 
         day = Day(
             date=__import__("datetime").date(2026, 4, 12),
