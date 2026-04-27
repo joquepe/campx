@@ -19,6 +19,7 @@ DEFAULT_VALIDATION_CONFIG = {
             (EntryType.WAKE_UP, EntryType.WAKE_UP, 1, 0),
             (EntryType.EVENING_PRAYER, EntryType.DAY_OFF, 1, 0),
             (EntryType.EVENING_PRAYER, EntryType.MORNING_PRAYER, 1, 0),
+            (EntryType.EVENING_PRAYER, EntryType.WAKE_UP, 1, 0),
         ),
         "max_responsibilities_per_day": 3,
         "max_responsibilities_per_entry_type": (
