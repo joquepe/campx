@@ -1,5 +1,5 @@
 import datetime as dt
-from campx.model.factory import _assign_initials
+from campx.factory import _assign_initials
 from campx.model.participant import Participant
 from campx.model.schedule_entry import ScheduleEntry
 from campx.model.schedule import Schedule
