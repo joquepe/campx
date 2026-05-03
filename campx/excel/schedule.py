@@ -96,7 +96,11 @@ def fill_schedule_sheet(
         date_cell = worksheet.cell(
             row=date_row,
             column=col,
-            value=day.as_str("%d %b", swedish_month_names=True),
+            value=day.as_str(
+                "%a %d %b",
+                swedish_month_names=True,
+                swedish_weekday_names=True,
+            ),
         )
         date_cell.font = Font(bold=True)
 

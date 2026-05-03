@@ -69,7 +69,11 @@ def fill_responsibilities_sheet(camp: Camp, ws: Worksheet):
         ws.cell(
             row=1,
             column=start_col,
-            value=day.as_str(format="%d %b", swedish_month_names=True),
+            value=day.as_str(
+                format="%a %d %b",
+                swedish_month_names=True,
+                swedish_weekday_names=True,
+            ),
         )
         ws.cell(row=1, column=start_col).alignment = Alignment(
             vertical="center", horizontal="center"

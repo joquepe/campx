@@ -185,6 +185,19 @@ class TestDay:
         day = Day(date=date)
         assert day.as_str("%d %B", swedish_month_names=True) == "15 april"
 
+    def test_day_as_str_with_swedish_abbreviated_weekday_and_month(self):
+        """Test day string representation with Swedish abbreviated weekday and month."""
+        date = dt.date(2026, 4, 12)
+        day = Day(date=date)
+        assert (
+            day.as_str(
+                "%a %d %b",
+                swedish_month_names=True,
+                swedish_weekday_names=True,
+            )
+            == "sön 12 apr."
+        )
+
     def test_day_get_entries_by_type(self):
         """Test retrieving entries by type from a day."""
         date = dt.date(2026, 3, 15)
