@@ -18,6 +18,7 @@ from campx.excel.eligible_leaders import fill_eligible_leaders_sheet
 from campx.excel.leader_interactions import fill_leader_interactions_sheet
 from campx.excel.metrics import fill_metrics_sheet
 from campx.excel.working_hours import fill_working_hours_sheet
+from campx.excel.pdf_export import export_schedule_pdfs
 from campx.validation import get_errors
 from openpyxl.worksheet.worksheet import Worksheet
 
@@ -117,7 +118,7 @@ def add_participant_schedule_sheets(camp: Camp, workbook: Workbook):
         fill_schedule_sheet_for_participant(camp, participant_sheet, participant)
 
 
-def create_camp_excel(camp: Camp):
+def create_camp_excel(camp: Camp, export_pdfs: bool = True):
     logger.info("Generating excel...")
     workbook = Workbook()
     sheets = [
@@ -138,3 +139,6 @@ def create_camp_excel(camp: Camp):
     output_path = Path()
     workbook.save(f"{output_path}/{camp.name}_schema.xlsx")
     logger.info(f"Excel saved at {output_path}/{camp.name}_schema.xlsx")
+
+    if export_pdfs:
+        export_schedule_pdfs(camp, output_path)
