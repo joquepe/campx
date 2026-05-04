@@ -9,6 +9,8 @@ import sys
 import tempfile
 
 from openpyxl import Workbook
+from openpyxl.cell.cell import MergedCell
+from openpyxl.styles import PatternFill
 
 from campx.excel.participant_sheets import (
     fill_schedule_sheet_for_participant,
@@ -18,6 +20,8 @@ from campx.excel.schedule import fill_schedule_sheet
 from campx.model.camp import Camp
 
 logger = logging.getLogger(__name__)
+
+WHITE = "00FFFFFF"
 
 
 def _sanitize_file_component(value: str) -> str:
@@ -92,6 +96,28 @@ def _convert_xlsx_to_pdf_with_applescript(
     return False
 
 
+def _blank_unformatted_cells_for_pdf(workbook: Workbook) -> None:
+    """Blank only cells left untouched by workbook generation before PDF export."""
+    white_fill = PatternFill(start_color=WHITE, end_color=WHITE, fill_type="solid")
+
+    for worksheet in workbook.worksheets:
+        worksheet.print_options.gridLines = False
+        for row in worksheet.iter_rows(
+            min_row=1,
+            max_row=worksheet.max_row,
+            min_col=1,
+            max_col=worksheet.max_column,
+        ):
+            for cell in row:
+                if isinstance(cell, MergedCell):
+                    continue
+                if cell.value not in (None, ""):
+                    continue
+                if cell.has_style:
+                    continue
+                cell.fill = white_fill
+
+
 def export_schedule_pdfs(camp: Camp, output_dir: Path | None = None) -> list[Path]:
     """Export schedule PDFs for the main schedule and each leader sheet on macOS."""
     if sys.platform != "darwin":
@@ -118,6 +144,7 @@ def export_schedule_pdfs(camp: Camp, output_dir: Path | None = None) -> list[Pat
         main_sheet = main_workbook.active
         main_sheet.title = "Schema"
         fill_schedule_sheet(camp, main_sheet)
+        _blank_unformatted_cells_for_pdf(main_workbook)
 
         main_xlsx_path = temp_dir_path / f"{camp_name}_Schema.xlsx"
         main_pdf_path = output_dir / f"{camp_name}_Schema.pdf"
@@ -134,6 +161,7 @@ def export_schedule_pdfs(camp: Camp, output_dir: Path | None = None) -> list[Pat
                 leader_workbook, leader
             )
             fill_schedule_sheet_for_participant(camp, leader_sheet, leader)
+            _blank_unformatted_cells_for_pdf(leader_workbook)
 
             leader_name = _sanitize_file_component(leader.nick_name or leader.full_name)
             leader_xlsx_path = temp_dir_path / f"{camp_name}_{leader_name}.xlsx"

@@ -1,7 +1,13 @@
 from datetime import date
 from pathlib import Path
 
-from campx.excel.pdf_export import export_schedule_pdfs
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
+
+from campx.excel.pdf_export import (
+    export_schedule_pdfs,
+    _blank_unformatted_cells_for_pdf,
+)
 from campx.model.camp import Camp
 from campx.model.camp_place import CampPlace
 from campx.model.day import Day
@@ -125,3 +131,22 @@ def test_export_schedule_pdfs_uses_absolute_paths_for_osascript(monkeypatch):
         assert command[3] == "--"
         assert Path(command[4]).is_absolute()
         assert Path(command[5]).is_absolute()
+
+
+def test_blank_unformatted_cells_for_pdf_only_affects_default_empty_cells():
+    workbook = Workbook()
+    worksheet = workbook.active
+
+    untouched_empty = worksheet.cell(row=2, column=2)
+    styled_empty = worksheet.cell(row=2, column=3)
+    styled_empty.fill = PatternFill(
+        start_color="00FF0000", end_color="00FF0000", fill_type="solid"
+    )
+    worksheet.cell(row=1, column=1, value="Header")
+
+    _blank_unformatted_cells_for_pdf(workbook)
+
+    assert worksheet.print_options.gridLines is False
+    assert untouched_empty.fill.fill_type == "solid"
+    assert getattr(untouched_empty.fill.start_color, "rgb", None) == "00FFFFFF"
+    assert getattr(styled_empty.fill.start_color, "rgb", None) == "00FF0000"
