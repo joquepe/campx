@@ -8,6 +8,8 @@ from openpyxl.worksheet.properties import PageSetupProperties, WorksheetProperti
 from campx.excel.responsibilities import fill_responsibilities_sheet
 from campx.excel.schedule import (
     fill_schedule_sheet,
+)
+from campx.excel.participant_sheets import (
     fill_schedule_sheet_for_participant,
     make_unique_schedule_sheet_name,
 )
