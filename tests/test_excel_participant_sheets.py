@@ -181,6 +181,65 @@ def test_participant_schedule_sheet_highlights_only_target_participant_entries()
     assert not_highlighted_other_only
 
 
+def test_participant_schedule_sheet_preserves_italic_for_non_highlighted_names():
+    leader = Participant(
+        participant_id=1,
+        first_name="Alice",
+        last_name="Andersson",
+        gender="F",
+        birthday=date(1995, 1, 1),
+        participant_type=ParticipantType.LEADER,
+        nick_name="Ali",
+        first_name_initials="A",
+        last_name_initials="A",
+    )
+    other_leader = Participant(
+        participant_id=2,
+        first_name="Bo",
+        last_name="Berg",
+        gender="M",
+        birthday=date(1994, 1, 1),
+        participant_type=ParticipantType.LEADER,
+        nick_name="Bo",
+        first_name_initials="B",
+        last_name_initials="B",
+    )
+    entry = ScheduleEntry(
+        entry_type=EntryType.WAKE_UP,
+        name="Morning wake-up",
+        start_time="08:00",
+        end_time="08:15",
+        responsible=[leader, other_leader],
+    )
+    day = Day(date=date(2026, 4, 12), schedule_entries=[entry])
+    camp = Camp(
+        name="TestCamp",
+        camp_place=CampPlace("TestPlace"),
+        participants=[leader, other_leader],
+        schedule=Schedule(days=[day]),
+    )
+
+    wb = Workbook()
+    add_participant_schedule_sheets(camp, wb)
+    sheet = wb["Ali"]
+
+    mixed_cell = next(
+        cell
+        for row in sheet.iter_rows()
+        for cell in row
+        if "Ali" in str(cell.value or "") and "Bo" in str(cell.value or "")
+    )
+
+    bo_segments = [
+        part
+        for part in mixed_cell.value
+        if isinstance(part, TextBlock) and "Bo" in part.text
+    ]
+    assert bo_segments
+    assert bo_segments[0].font is not None
+    assert bo_segments[0].font.i is True
+
+
 def test_validation_errors_sheet_lists_errors():
     leader = Participant(
         participant_id=1,

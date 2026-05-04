@@ -1,5 +1,6 @@
 """Participant-specific schedule sheets with highlighting."""
 
+from copy import copy
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.styles import Font
@@ -84,10 +85,22 @@ def _highlight_token_in_cell(cell, token: str) -> None:
 
     pieces = value.split(token)
     rich_text = CellRichText()
-    highlight_font = InlineFont(b=True, color="00FF0000")
+    base_font = InlineFont(
+        rFont=cell.font.name,
+        sz=cell.font.sz,
+        b=cell.font.bold,
+        i=cell.font.italic,
+        u=cell.font.underline,
+        strike=cell.font.strike,
+        color=cell.font.color,
+    )
+    highlight_font = copy(base_font)
+    highlight_font.b = True
+    highlight_font.color = "00FF0000"
+
     for idx, piece in enumerate(pieces):
         if piece:
-            rich_text.append(piece)
+            rich_text.append(TextBlock(base_font, piece))
         if idx < len(pieces) - 1:
             rich_text.append(TextBlock(highlight_font, token))
     cell.value = rich_text
