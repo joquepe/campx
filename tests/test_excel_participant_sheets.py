@@ -11,6 +11,7 @@ from campx.model.schedule import Schedule
 from campx.model.schedule_entry import ScheduleEntry
 from campx.model.enums import EntryType, ParticipantType
 from campx.model.participant import Participant
+from openpyxl.cell.rich_text import TextBlock
 
 
 def test_add_participant_schedule_sheets_creates_nickname_sheets():
@@ -97,6 +98,87 @@ def test_participant_schedule_sheet_highlights_target_name():
     ]
 
     assert highlighted
+
+
+def test_participant_schedule_sheet_highlights_only_target_participant_entries():
+    leader = Participant(
+        participant_id=1,
+        first_name="Alice",
+        last_name="Andersson",
+        gender="F",
+        birthday=date(1995, 1, 1),
+        participant_type=ParticipantType.LEADER,
+        nick_name="Ali",
+        first_name_initials="A",
+        last_name_initials="A",
+    )
+    other_leader = Participant(
+        participant_id=2,
+        first_name="Bo",
+        last_name="Berg",
+        gender="M",
+        birthday=date(1994, 1, 1),
+        participant_type=ParticipantType.LEADER,
+        nick_name="Bo",
+        first_name_initials="B",
+        last_name_initials="B",
+    )
+    entry = ScheduleEntry(
+        entry_type=EntryType.WAKE_UP,
+        name="Morning wake-up",
+        start_time="08:00",
+        end_time="08:15",
+        responsible=[leader, other_leader],
+    )
+    other_only_entry = ScheduleEntry(
+        entry_type=EntryType.MORNING_PRAYER,
+        name="Morning prayer",
+        start_time="09:00",
+        end_time="09:30",
+        responsible=[other_leader],
+    )
+    day = Day(date=date(2026, 4, 12), schedule_entries=[entry, other_only_entry])
+    camp = Camp(
+        name="TestCamp",
+        camp_place=CampPlace("TestPlace"),
+        participants=[leader, other_leader],
+        schedule=Schedule(days=[day]),
+    )
+
+    wb = Workbook()
+    add_participant_schedule_sheets(camp, wb)
+    sheet = wb["Ali"]
+
+    def _token_highlighted(cell, token: str) -> bool:
+        value = cell.value
+        if isinstance(value, str):
+            return False
+        for part in value:
+            if isinstance(part, TextBlock) and part.text == token:
+                if part.font and part.font.b is True:
+                    color = getattr(part.font.color, "rgb", None)
+                    if color in {"FF0000", "00FF0000"}:
+                        return True
+        return False
+
+    highlighted_target = [
+        cell
+        for row in sheet.iter_rows()
+        for cell in row
+        if "Ali" in str(cell.value or "") and _token_highlighted(cell, "Ali")
+    ]
+
+    not_highlighted_other_only = [
+        cell
+        for row in sheet.iter_rows()
+        for cell in row
+        if "Bo" in str(cell.value or "")
+        and "Ali" not in str(cell.value or "")
+        and not _token_highlighted(cell, "Bo")
+    ]
+
+    assert highlighted_target
+    assert not_highlighted_other_only
 
 
 def test_validation_errors_sheet_lists_errors():
