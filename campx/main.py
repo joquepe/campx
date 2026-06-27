@@ -7,7 +7,12 @@ from campx.validation import run_validations
 from campx.icalendar.generate import create_calendar
 
 
-def main(camp_name: str, input_dir: Path | None = None, validate: bool = True) -> None:
+def main(
+    camp_name: str,
+    input_dir: Path | None = None,
+    validate: bool = True,
+    export_pdfs: bool = False,
+) -> None:
     """Generate Excel and calendar output for a named camp."""
     factory = Factory(input_base_dir=input_dir)
     repository = Repository(factory)
@@ -16,5 +21,5 @@ def main(camp_name: str, input_dir: Path | None = None, validate: bool = True) -
     if validate:
         run_validations(camp)
 
-    create_camp_excel(camp)
+    create_camp_excel(camp, export_pdfs)
     create_calendar(camp)
