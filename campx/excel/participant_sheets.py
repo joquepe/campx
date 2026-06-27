@@ -3,7 +3,6 @@
 from copy import copy
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl.styles import Font
 from openpyxl.cell.rich_text import CellRichText, TextBlock
 from openpyxl.cell.text import InlineFont
 
@@ -26,12 +25,6 @@ def fill_schedule_sheet_for_participant(
 ):
     """Create a participant-specific schedule sheet with highlighting."""
     fill_schedule_sheet(camp, worksheet)
-    participant_label = participant.nick_name or participant.full_name
-    label_col = worksheet.max_column + 2
-    label_cell = worksheet.cell(
-        row=1, column=label_col, value=f"Participant: {participant_label}"
-    )
-    label_cell.font = Font(bold=True, color="FF0000")
     _highlight_responsible_cells_for_participant_sheet(camp, worksheet, participant)
 
 
