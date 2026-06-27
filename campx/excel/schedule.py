@@ -8,7 +8,6 @@ from openpyxl.worksheet.properties import WorksheetProperties, PageSetupProperti
 from openpyxl.utils import get_column_letter
 from campx.model.schedule_entry import ScheduleEntry
 from campx.model.enums import EntryType
-from campx.model.participant import Participant
 from campx.model.schedule import Schedule
 from campx.excel.utilities import START_HOUR, END_HOUR, get_activity_color
 from campx.excel.utilities import Colors
@@ -96,7 +95,11 @@ def fill_schedule_sheet(
         date_cell = worksheet.cell(
             row=date_row,
             column=col,
-            value=day.as_str("%d %b", swedish_month_names=True),
+            value=day.as_str(
+                "%a %d %b",
+                swedish_month_names=True,
+                swedish_weekday_names=True,
+            ),
         )
         date_cell.font = Font(bold=True)
 
@@ -232,24 +235,6 @@ def fill_schedule_sheet(
         date_row, camp.schedule, worksheet, time_slots, bottom_types, total_rows
     )
     apply_uniform_schedule_dimensions(worksheet, camp, time_slots)
-
-
-def fill_schedule_sheet_for_participant(
-    camp: Camp, worksheet: Worksheet, participant: Participant
-):
-    fill_schedule_sheet(camp, worksheet)
-    participant_label = participant.nick_name or participant.full_name
-    label_col = worksheet.max_column + 2
-    label_cell = worksheet.cell(
-        row=1, column=label_col, value=f"Participant: {participant_label}"
-    )
-    label_cell.font = Font(bold=True, color="FF0000")
-
-
-def make_unique_schedule_sheet_name(workbook: Workbook, participant: Participant):
-    return _make_unique_sheet_name(
-        workbook, participant.nick_name or participant.full_name
-    )
 
 
 def get_time_slots(start_hour: int, end_hour: int, extra_rows: int) -> dict[str, int]:

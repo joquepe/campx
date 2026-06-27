@@ -75,7 +75,7 @@ class TestExcelScheduleGeneration:
 
         assert (
             ws.cell(row=EntryType.time_independent_top().__len__() + 1, column=2).value
-            == "12 apr."
+            == "sön 12 apr."
         )
 
     def test_responsibilities_sheet_uses_swedish_month_names(self):
@@ -100,7 +100,7 @@ class TestExcelScheduleGeneration:
 
         fill_responsibilities_sheet(camp, ws)
 
-        assert ws.cell(row=1, column=2).value == "12 apr."
+        assert ws.cell(row=1, column=2).value == "sön 12 apr."
 
     def test_eligible_leaders_sheet_has_responsible_count_as_third_column(self):
         wb = Workbook()
