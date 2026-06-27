@@ -17,12 +17,12 @@ def create_calendar(camp: Camp):
         for entry in day.schedule_entries:
             event = Event()
             event.name = entry.entry_type.value.emoji
-            if isinstance(entry.name, str):
+            if entry.name != "":
                 event.name += entry.name
             else:
                 event.name += entry.entry_type.value.long
 
-            event.location = ", ".join(r.initials for r in entry.responsible)
+            event.location = ", ".join(r.nick_name for r in entry.responsible)
             event.description = ", ".join(r.full_name for r in entry.responsible)
 
             if entry.start_time is None:
