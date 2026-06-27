@@ -87,7 +87,8 @@ def fill_schedule_sheet(
 
     # Create time-independent rows above the date row
     for row_offset, entry_type in enumerate(top_types, start=1):
-        worksheet.cell(row=row_offset, column=1, value=entry_type.value.long)
+        cell = worksheet.cell(row=row_offset, column=1, value=entry_type.value.long)
+        cell.font = Font(bold=True)
 
     # Create date headers
     date_row = buffer_rows_top + 1
@@ -126,12 +127,14 @@ def fill_schedule_sheet(
                 column=col,
                 value="\n".join(v for v in values if v),
             )
-            if entry_type == EntryType.THEME or any(entry.name for entry in entries):
+            if entry_type == EntryType.THEME:
                 cell.font = Font(
                     bold=True,
                     italic=any(entry.responsible for entry in entries),
                 )
-            elif any(entry.responsible for entry in entries):
+            elif any(entry.responsible for entry in entries) or any(
+                entry.name for entry in entries
+            ):
                 cell.font = Font(italic=True)
 
     # Loop through each day in the schedule and add timed activities
@@ -189,11 +192,12 @@ def fill_schedule_sheet(
     # Create bottom time-independent rows after timed slots
     bottom_start_row = max(time_slots.values()) + 2
     for row_offset, entry_type in enumerate(bottom_types, start=1):
-        worksheet.cell(
+        cell = worksheet.cell(
             row=bottom_start_row + row_offset - 1,
             column=1,
             value=entry_type.value.short,
         )
+        cell.font = Font(bold=True)
 
     # Fill bottom time-independent values per day
     for col, day in enumerate(camp.schedule.days, start=2):
