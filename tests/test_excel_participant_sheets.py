@@ -84,19 +84,26 @@ def test_participant_schedule_sheet_highlights_target_name():
     add_participant_schedule_sheets(camp, wb)
     sheet = wb["Ali"]
 
-    assert any(cell.value == "Participant: Ali" for cell in sheet[1])
+    assert all(cell.value != "Participant: Ali" for cell in sheet[1])
 
-    highlighted = [
-        cell
-        for row in sheet.iter_rows()
-        for cell in row
-        if isinstance(cell.value, str)
-        and "Ali" in cell.value
-        and cell.font is not None
-        and cell.font.color is not None
-        and getattr(cell.font.color, "rgb", None) in {"FF0000", "00FF0000"}
-    ]
+    from openpyxl.cell.rich_text import CellRichText, TextBlock
 
+    highlighted = []
+    for row in sheet.iter_rows():
+        for cell in row:
+            if isinstance(cell.value, CellRichText):
+                for block in cell.value:
+                    if isinstance(block, TextBlock) and "Ali" in block.text:
+                        print(
+                            f"Block text: {block.text}, Font color: {getattr(block.font, 'color', None)}"
+                        )
+                    if (
+                        isinstance(block, TextBlock)
+                        and block.text == "Ali"
+                        and block.font is not None
+                        and getattr(block.font, "color", None) in {"FF0000", "00FF0000"}
+                    ):
+                        highlighted.append(cell)
     assert highlighted
 
 
