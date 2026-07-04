@@ -18,6 +18,7 @@ from campx.excel.eligible_leaders import fill_eligible_leaders_sheet
 from campx.excel.leader_interactions import fill_leader_interactions_sheet
 from campx.excel.metrics import fill_metrics_sheet
 from campx.excel.working_hours import fill_working_hours_sheet
+from campx.excel.non_overlapping_pairs import fill_non_overlapping_pairs_sheet
 from campx.excel.pdf_export import export_schedule_pdfs
 from campx.validation import get_errors
 from openpyxl.worksheet.worksheet import Worksheet
@@ -67,6 +68,12 @@ def add_working_hours_sheet(camp: Camp, workbook: Workbook):
     logger.info("Adding working hours sheet...")
     working_hours_sheet = workbook.create_sheet(title="Arbetstimmar")
     fill_working_hours_sheet(camp, working_hours_sheet)
+
+
+def add_non_overlapping_pairs_sheet(camp: Camp, workbook: Workbook):
+    logger.info("Adding non-overlapping pairs sheet...")
+    non_overlapping_pairs_sheet = workbook.create_sheet(title="Ej överlapp")
+    fill_non_overlapping_pairs_sheet(camp, non_overlapping_pairs_sheet)
 
 
 def add_validation_errors_sheet(camp: Camp, workbook: Workbook):
@@ -125,6 +132,7 @@ def create_camp_excel(camp: Camp, export_pdfs: bool = True):
         add_schedule_sheet,
         add_responsibilities_sheet,
         add_working_hours_sheet,
+        add_non_overlapping_pairs_sheet,
         add_overview_sheet,
         add_metrics_sheet,
         add_eligible_leaders_by_schedule_entry,
